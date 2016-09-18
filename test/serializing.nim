@@ -104,6 +104,54 @@ suite "Serialization":
       except: gotException = true
       assert gotException, "Expected exception, got none."
 
+  test "Serialization: Load Hex byte (0xFF)":
+    let input = newStringStream("0xFF")
+    var result: byte
+    load(input, result)
+    assert(result == 255)
+
+  test "Serialization: Load Hex byte (0xC)":
+    let input = newStringStream("0xC")
+    var result: byte
+    load(input, result)
+    assert(result == 12)
+
+  test "Serialization: Load Octal byte (0o14)":
+    let input = newStringStream("0o14")
+    var result: byte
+    load(input, result)
+    assert(result == 12)
+
+  test "Serialization: Load byte (14)":
+    let input = newStringStream("14")
+    var result: byte
+    load(input, result)
+    assert(result == 14)
+
+  test "Serialization: Load Hex int (0xFF)":
+    let input = newStringStream("0xFF")
+    var result: int
+    load(input, result)
+    assert(result == 255)
+
+  test "Serialization: Load Hex int (0xC)":
+    let input = newStringStream("0xC")
+    var result: int
+    load(input, result)
+    assert(result == 12)
+
+  test "Serialization: Load Octal int (0o14)":
+    let input = newStringStream("0o14")
+    var result: int
+    load(input, result)
+    assert(result == 12)
+
+  test "Serialization: Load int (14)":
+    let input = newStringStream("14")
+    var result: int
+    load(input, result)
+    assert(result == 14)
+
   test "Serialization: Load nil string":
     let input = newStringStream("!nim:nil:string \"\"")
     var result: string
@@ -267,7 +315,20 @@ suite "Serialization":
     var output = newStringStream()
     dump(input, output, tsNone)
     assertStringEqual "%YAML 1.2\n--- \nstr: value\ni: 42\nb: y", output.data
-    
+
+  test "Serialization: Load Multiple Documents":
+    let input = newStringStream("1\n---\n2")
+    var result: seq[int]
+    loadMultiDoc(input, result)
+    assert result[0] == 1
+    assert result[1] == 2
+
+  test "Serialization: Load Multiple Documents":
+    let input = newStringStream("1")
+    var result: seq[int]
+    loadMultiDoc(input, result)
+    assert result[0] == 1
+
   test "Serialization: Load custom object":
     let input = newStringStream("firstnamechar: P\nsurname: Pan\nage: 12")
     var result: Person
